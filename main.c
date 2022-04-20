@@ -2,27 +2,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-void lsh_loop(void);
 
 int main(int argc, int **argv){
-
-    lsh_loop();
-
-    return EXIT_SUCCESS;
-}
-
-void lsh_loop(void){
-    
-    char *line;
-    char **args;
-    int status;
-
-    while (status)
+    char *input=malloc(sizeof(int));
+    while (1>0)
     {
         printf("prompt$");
-        line = lsh_read_line(line);
-        args = lsh_split_line(line);
-        status = lsh_execute(args);
+        scanf("%c",&input);
+        printf("\n");
     }
     
+
+    return 0;
 }
