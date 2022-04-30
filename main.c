@@ -5,14 +5,15 @@
 #include <limits.h>
 
 
+
 void prompt(){
     
-    char *username[LOGIN_NAME_MAX];
     char hostname[HOST_NAME_MAX];
-    getlogin_r(*username,LOGIN_NAME_MAX);
+    char *username = getenv("USER");
     gethostname(hostname,HOST_NAME_MAX);
-
-    printf("%s@%s>",hostname,username);
+    getlogin_r(username,LOGIN_NAME_MAX);
+    printf("[%s]@",hostname);
+    printf("[%s]$",username);
 }
 
 
