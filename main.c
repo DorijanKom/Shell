@@ -57,28 +57,44 @@ void rm(char filename[FILENAME_MAX]){
 
 void cowsay(char input[MAX_INPUT]){
     
+    fgets(input,MAX_INPUT,stdin);
+
+    int charcounter=strlen(input);
+    int linecount;
+
+    printf(" ");
+    for(linecount = 1;linecount<=charcounter;linecount++){
+        printf("_");
+    }
     
-    
-    char *line1 = "   \ \n";
-    char *line2 = "    \ \n";
+    char *line1 = "   \\ \n";           // Character that displays when you type in cowsay
+    char *line2 = "    \\ \n";
     char *line3 = "        .--. \n";
     char *line4 = "       |o_o | \n";
     char *line5 = "       |:_/ | \n";
-    char *line6 = "      //   \ \ \n";
+    char *line6 = "      //   \\ \\ \n";
     char *line7 = "     (|     | ) \n";
-    char *line8 = "    /'\_   _/`\ \n";
-    char *line9 = "    \___)=(___/ \n";
+    char *line8 = "    /'\\_   _/`\\ \n";
+    char *line9 = "    \\___)=(___/ \n";
 
-    printf("%s", output);
-    printf(line1);
-    printf(line2);
-    printf(line3);
-    printf(line4);
-    printf(line5);
-    printf(line6);
-    printf(line7);
-    printf(line8);
-    printf(line9);
+    
+    if(strcmp(input,"") == 0){
+        printf("Linux");
+    }else{
+        printf("%s", input);
+    }
+    for(linecount = 1;linecount<=charcounter;linecount++){
+        printf("-");
+    }
+    printf("%s", line1);
+    printf("%s", line2);
+    printf("%s", line3);
+    printf("%s", line4);
+    printf("%s", line5);
+    printf("%s", line6);
+    printf("%s", line7);
+    printf("%s", line8);
+    printf("%s", line9);
 
 }
 
