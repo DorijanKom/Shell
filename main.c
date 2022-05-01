@@ -4,7 +4,10 @@
 #include <unistd.h>
 #include <limits.h>
 
-
+#define BRED "\e[1;31m"     // Color values using the ANSI color method from the  <stdlib.h>
+#define BYEL "\e[1;33m"      
+#define BCYN "\e[1;36m"
+#define reset "\e[0m"
 
 void prompt(){
     
@@ -15,8 +18,16 @@ void prompt(){
     into the username pointer (Works only on Linux!). We can achieve the same with getlogin() */
     char *username = getenv("USER");
     gethostname(hostname,HOST_NAME_MAX); // We get the hostname through the gethostname function
-    printf("[%s]@",hostname);
-    printf("[%s]:~$",username);
+    
+    printf(BRED"[");
+    printf(BYEL"%s",hostname);
+    printf(BRED"]");
+    printf(BCYN"@");
+    printf(BRED"[");
+    printf(BYEL"%s",username);
+    printf(BRED"]");
+    printf(BCYN":~$");
+    printf(reset);
 }
 
 void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
