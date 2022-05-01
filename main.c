@@ -37,7 +37,6 @@ void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
 
     
     char c; // This is used for reading for reading characters in a file
-    //fgets(filename,FILENAME_MAX,stdin);
 
     fpReadFile = fopen(filename,"r"); // Opens the file
 
@@ -58,7 +57,6 @@ void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
 void rm(char filename[FILENAME_MAX]){
 
     int ret = -1;
-    //fgets(filename,FILENAME_MAX,stdin);
 
     ret = remove(filename);
 
@@ -70,7 +68,7 @@ void rm(char filename[FILENAME_MAX]){
     }
 }
 
-void cowsay(char *input[],int argc){
+void cowsay(int argc,char *input[]){
     
 
     unsigned int counter;
@@ -84,7 +82,7 @@ void cowsay(char *input[],int argc){
     }
 
     
-    for(counter=1;counter<argc;counter++){
+    for(counter=1;counter < argc;counter++){
         argscharcount=(argscharcount+1+strlen(input[counter])); //Counts the characters in the given argument
     }
     if(argscharcount==0){
@@ -99,15 +97,19 @@ void cowsay(char *input[],int argc){
     printf(" ");
     for(counter=1;counter<=argscharcount;counter++){
         printf("_");
+        if(counter==50) break;
     }
-    printf("\n<");
+     printf("\n<");
 
-    for(counter=1;counter<argscharcount;counter++){
+    for(counter=1;counter<argc;counter++){
         printf("%s",input[counter]);
+        if(counter%7==0) printf("\n< ");
     }
     printf(">\n");
+    printf(" ");
     for(counter=1;counter<=argscharcount;counter++){
         printf("-");
+        if(counter==50) break;
     }
     printf("\n");
 
@@ -132,7 +134,6 @@ void cowsay(char *input[],int argc){
     printf("%s", line7);
     printf("%s", line8);
     printf("%s", line9);
-    free(input);
 
 }
 
@@ -145,15 +146,13 @@ int main(void){
 
     // We use the input variable for user input
     char input[MAX_INPUT];
-    //clear();
+    system("clear"); //When we first initiate our shell the screen is cleared(This is Linux specific, on Windows it is system("cls"))
     while (1)
     {
         prompt();
         /* fgets is more optimal than scanf for user input because it reads a line of text and is
         better at handling overflow of arrays */
         fgets(input,MAX_INPUT,stdin);
-        
-
     }
         
     return 0;
