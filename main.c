@@ -19,14 +19,14 @@ void prompt(){
     char *username = getenv("USER");
     gethostname(hostname,HOST_NAME_MAX); // We get the hostname through the gethostname function
     
-    printf(BRED"[");
+    printf(BRED"[");            // We implement the colors from this line and reset them to the default on line 30
     printf(BYEL"%s",hostname);
     printf(BRED"]");
     printf(BCYN"@");
     printf(BRED"[");
     printf(BYEL"%s",username);
     printf(BRED"]");
-    printf(BCYN":~$");
+    printf(BCYN":~$ ");
     printf(reset);
 }
 
@@ -107,6 +107,11 @@ void cowsay(char input[MAX_INPUT]){
     printf("%s", line8);
     printf("%s", line9);
 
+}
+
+void clear(){
+    const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
+    write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
 }
 
 int main(void){
