@@ -4,10 +4,11 @@
 #include <unistd.h>
 #include <limits.h>
 
-#define BRED "\e[1;31m"     // Color values using the ANSI color method from the  <stdlib.h>
-#define BYEL "\e[1;33m"      
-#define BCYN "\e[1;36m"
-#define reset "\e[0m"
+                            // Color values using the ANSI color method from the  <stdlib.h>
+#define BRED "\e[1;31m"     // Red with bold characters
+#define BYEL "\e[1;33m"     // Yellow with bold characters
+#define BCYN "\e[1;36m"     // Cyan with bold characters
+#define reset "\e[0m"       // Value for reseting the characters to the default format
 
 void prompt(){
     
@@ -31,52 +32,85 @@ void prompt(){
 }
 
 void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
+
+    FILE *fpReadFile; 
+
     
     char c; // This is used for reading for reading characters in a file
-
-    fgets(filename,FILENAME_MAX,stdin); 
-    FILE *fpReadFile; 
+    //fgets(filename,FILENAME_MAX,stdin);
 
     fpReadFile = fopen(filename,"r"); // Opens the file
 
-    if(fpReadFile){
-        while ((c = getc(fpReadFile)) != EOF) // Reads file character by character
-        {
-            printf("%c",c); // Prints it out
-        }
-        fclose(fpReadFile);     // Closes the file
-    } else{
+    if(fpReadFile==NULL){
+        
         printf("\nError: Unable to open file.");
         exit(0);
     }
+    while ((c = getc(fpReadFile)) != EOF) // Reads file character by character
+    {
+        printf("%c",c); // Prints it out
+        c=fgetc(fpReadFile);
+    }
+    fclose(fpReadFile);     // Closes the file
+    printf("\n"); 
 }
 
 void rm(char filename[FILENAME_MAX]){
 
     int ret = -1;
-    fgets(filename,FILENAME_MAX,stdin);
+    //fgets(filename,FILENAME_MAX,stdin);
 
     ret = remove(filename);
 
     if(ret == 0){
-        printf("File deleted succesfully.");
+        printf("File deleted succesfully.\n");
     }
     else{
-        printf("Unable to delete file.");
+        printf("Error: Unable to delete file.\n");
     }
 }
 
-void cowsay(char input[MAX_INPUT]){
+void cowsay(char *input[],int argc){
     
-    fgets(input,MAX_INPUT,stdin);
 
-    int charcounter=strlen(input);
-    int linecount;
+    unsigned int counter;
+    unsigned int argscharcount=0;
 
+    /*In case a user only types in cowsay this is printed out*/
+    if( argc == 1 ) {
+        printf("This program displays all of it arguments in a speech bubble.\n"
+        "After typing in the command, type in what you want Tux to say.");
+        exit(EXIT_FAILURE);
+    }
+
+    
+    for(counter=1;counter<argc;counter++){
+        argscharcount=(argscharcount+1+strlen(input[counter])); //Counts the characters in the given argument
+    }
+    if(argscharcount==0){
+        printf("This program displays all of it arguments in a speech bubble.\n" 
+        "After typing in the command, type in what you want Tux to say."); //If no arguments are given this message is printed out.
+        exit(EXIT_FAILURE);
+    }
+
+    argscharcount=argscharcount+1;
+
+    //Displays the speech bubble
     printf(" ");
-    for(linecount = 1;linecount<=charcounter;linecount++){
+    for(counter=1;counter<=argscharcount;counter++){
         printf("_");
     }
+    printf("\n<");
+
+    for(counter=1;counter<argscharcount;counter++){
+        printf("%s",input[counter]);
+    }
+    printf(">\n");
+    for(counter=1;counter<=argscharcount;counter++){
+        printf("-");
+    }
+    printf("\n");
+
     
     char *line1 = "   \\ \n";           // Character that displays when you type in cowsay
     char *line2 = "    \\ \n";
@@ -88,15 +122,7 @@ void cowsay(char input[MAX_INPUT]){
     char *line8 = "    /'\\_   _/`\\ \n";
     char *line9 = "    \\___)=(___/ \n";
 
-    
-    if(strcmp(input,"") == 0){
-        printf("Linux");
-    }else{
-        printf("%s", input);
-    }
-    for(linecount = 1;linecount<=charcounter;linecount++){
-        printf("-");
-    }
+
     printf("%s", line1);
     printf("%s", line2);
     printf("%s", line3);
@@ -106,26 +132,26 @@ void cowsay(char input[MAX_INPUT]){
     printf("%s", line7);
     printf("%s", line8);
     printf("%s", line9);
+    free(input);
 
 }
 
 void clear(){
-    const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J";
-    write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 12);
-}
+    const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J"; // ANSI code for clearing screen (Works only on Linux because of the file descriptor we are using)
+    write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 11);    // Write method takes in the CLEAR_SCREEN_ANSI variable and
+}                                                   // outputs it, which clears the screen
 
 int main(void){
 
     // We use the input variable for user input
-    char input[1024];
-    system("clear");
-    
+    char input[MAX_INPUT];
+    //clear();
     while (1)
     {
         prompt();
         /* fgets is more optimal than scanf for user input because it reads a line of text and is
         better at handling overflow of arrays */
-        fgets(input,1024,stdin);
+        fgets(input,MAX_INPUT,stdin);
         
 
     }
