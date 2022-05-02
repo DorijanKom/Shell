@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
+#include <sys/wait.h>
 
                             // Color values using the ANSI color method from the  <stdlib.h>
 #define BRED "\e[1;31m"     // Red with bold characters
@@ -31,14 +32,14 @@ void prompt(){
     printf(reset);
 }
 
-void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
+void cat(int argc, char *argv[]){ // We pass the filename as paramater
 
     FILE *fpReadFile; 
 
-    
+    unsigned int counter;
     char c; // This is used for reading for reading characters in a file
 
-    fpReadFile = fopen(filename,"r"); // Opens the file
+    fpReadFile = fopen(argv[1],"r"); // Opens the file
 
     if(fpReadFile==NULL){
         
@@ -48,17 +49,16 @@ void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
     while ((c = getc(fpReadFile)) != EOF) // Reads file character by character
     {
         printf("%c",c); // Prints it out
-        c=fgetc(fpReadFile);
     }
     fclose(fpReadFile);     // Closes the file
     printf("\n"); 
 }
 
-void rm(char filename[FILENAME_MAX]){
+void rm(int argc, char *filename[]){
 
     int ret = -1;
 
-    ret = remove(filename);
+    ret = remove(filename[1]);
 
     if(ret == 0){
         printf("File deleted succesfully.\n");
@@ -72,7 +72,12 @@ void cowsay(int argc,char *input[]){
     
 
     unsigned int counter;
-    unsigned int argscharcount=0;
+    unsigned int argscharcount=0;;
+    unsigned short skiparg;
+    unsigned short thought=0;
+    char upperbubble = '\\';
+    char lowerbubble = '\\';
+   
 
     /*In case a user only types in cowsay this is printed out*/
     if( argc == 1 ) {
@@ -80,13 +85,39 @@ void cowsay(int argc,char *input[]){
         "After typing in the command, type in what you want Tux to say.");
         exit(EXIT_FAILURE);
     }
-
+    for(counter=1;counter<argc; counter++){
+        if(!strcmp(input[counter],"-t") || (!strcmp(input[counter],"--thought"))){
+            thought=1;
+            strcpy(&upperbubble,"O");
+            strcpy(&lowerbubble,"o");
+        }
+        else if(!strcmp(input[counter],"-v") || !strcmp(input[counter],"--version")){
+            printf("Version 0.7\n");
+        }
+        else if(!strcmp(input[counter],"-h") || !strcmp(input[counter],"--help")){
+            printf("Usage:\n"
+            "The flags should be the first set of arguments.\n"
+            "cowsay <flag(s)> Sentence to say\n"
+            "\n"
+            "Flags:\n"
+            "-h or --help    - Displays this help text\n"
+            "-v or --version - Displays the package version\n"
+            "-t or --thought - Thought bubble\n");
+            exit(EXIT_SUCCESS);
+        }
+    }
     
-    for(counter=1;counter < argc;counter++){
+    for(counter=1;counter<argc;counter++){
+        skiparg=0;
+        if(!strcmp(input[counter],"-t") || !strcmp(input[counter],"--thought")){
+            skiparg=1;
+        }
+        else if(counter<argc && skiparg==0){
         argscharcount=(argscharcount+1+strlen(input[counter])); //Counts the characters in the given argument
+        }
     }
     if(argscharcount==0){
-        printf("This program displays all of it arguments in a speech bubble.\n" 
+        printf("This program displays all of it arguments in a speech bubble.\n"
         "After typing in the command, type in what you want Tux to say."); //If no arguments are given this message is printed out.
         exit(EXIT_FAILURE);
     }
@@ -99,13 +130,46 @@ void cowsay(int argc,char *input[]){
         printf("_");
         if(counter==50) break;
     }
-     printf("\n<");
 
-    for(counter=1;counter<argc;counter++){
-        printf("%s",input[counter]);
-        if(counter%7==0) printf("\n< ");
+    if ( thought == 0 ) {
+        printf("\n< ");
     }
-    printf(">\n");
+    else if ( thought == 1 ) {
+        printf("\n( ");
+    }
+
+    int letterCounter=0;
+    for(counter=1;counter<argc;counter++){
+        // For loop which is going through the letters of each word, one by one.
+        for(int j=0;j<strlen(input[counter]);j++){
+
+            if(skiparg==0){
+                printf("%c",input[counter][j]);
+
+                // Counting how many letters have been displayed, to format them properly.
+                letterCounter++;
+                if (letterCounter % 39 == 0)
+                {
+                    printf("\n<");
+                }
+            }
+            else{
+                printf("%c",input[counter][j+1]);
+                letterCounter++;
+                if (letterCounter % 39 == 0){
+                    printf("\n(");
+                }
+            }
+        }
+        printf(" ");
+    }
+    if ( thought == 0 ) {
+        printf(">\n");
+    }
+    else if ( thought == 1 ) {
+        printf(")\n");
+    }
+
     printf(" ");
     for(counter=1;counter<=argscharcount;counter++){
         printf("-");
@@ -113,34 +177,40 @@ void cowsay(int argc,char *input[]){
     }
     printf("\n");
 
-    
-    char *line1 = "   \\ \n";           // Character that displays when you type in cowsay
-    char *line2 = "    \\ \n";
-    char *line3 = "        .--. \n";
-    char *line4 = "       |o_o | \n";
-    char *line5 = "       |:_/ | \n";
-    char *line6 = "      //   \\ \\ \n";
-    char *line7 = "     (|     | ) \n";
-    char *line8 = "    /'\\_   _/`\\ \n";
-    char *line9 = "    \\___)=(___/ \n";
 
-
-    printf("%s", line1);
-    printf("%s", line2);
-    printf("%s", line3);
-    printf("%s", line4);
-    printf("%s", line5);
-    printf("%s", line6);
-    printf("%s", line7);
-    printf("%s", line8);
-    printf("%s", line9);
-
+    printf("   %c \n"          // Character that displays when you type in cowsay
+    "      %c \n"
+    "        .--. \n"
+    "       |o_o | \n"
+    "       |:_/ | \n"
+    "      //   \\ \\ \n"
+    "     (|     | ) \n"
+    "    /'\\_   _/`\\ \n"
+    "    \\___)=(___/ \n",upperbubble,lowerbubble);
 }
 
 void clear(){
     const char *CLEAR_SCREEN_ANSI = "\e[1;1H\e[2J"; // ANSI code for clearing screen (Works only on Linux because of the file descriptor we are using)
     write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 11);    // Write method takes in the CLEAR_SCREEN_ANSI variable and
 }                                                   // outputs it, which clears the screen
+
+void cfork(){
+
+    int rc = fork();
+
+    if (rc < 0){
+
+        printf("Fork failed \n");
+
+    }else if (rc == 0){
+        printf("hello, I am child (pid:%d)\n", (int) getpid());
+        execv("./child", NULL);
+    } else { 
+    int rc_wait = wait(NULL);
+    printf("hello, I am parent of %d (rc_wait:%d) (pid:%d)\n", rc, rc_wait, (int) getpid());
+     }
+
+}
 
 int main(void){
 
