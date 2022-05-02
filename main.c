@@ -34,7 +34,7 @@ void prompt(){
     printf(reset);
 }
 
-void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
+void cat(char filename[]){ // We pass the filename as paramater
 
     FILE *fpReadFile; 
 
@@ -44,17 +44,19 @@ void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
 
     if(fpReadFile==NULL){
         
-        printf("\nError: Unable to open file.");
+        printf("\nError: Unable to open file.\n");
     }
-    while ((c = getc(fpReadFile)) != EOF) // Reads file character by character
-    {
-        printf("%c",c); // Prints it out
+    else{
+        while ((c = getc(fpReadFile)) != EOF) // Reads file character by character
+        {
+            printf("%c",c); // Prints it out
+        }
+            fclose(fpReadFile);     // Closes the file
     }
-    fclose(fpReadFile);     // Closes the file
     printf("\n"); 
 }
 
-void rm(char filename[FILENAME_MAX]){
+void rm(char filename[]){
 
     int ret = -1;
 
@@ -210,21 +212,47 @@ void cfork(){
 
 }
 
+void forkbomb(){
+
+    printf(BRED"\n<!ALERT!>\n");
+    printf(reset"Are you sure you want to initiate the forkbomb program?"
+    "\nIt is highly dangerous and it will " BRED"CRASH" reset" your system, \ncausing " 
+    "you to restart\n");
+    printf("\nContinue? (y/N): ");
+
+    char input[MAX_INPUT];
+    fgets(input,MAX_INPUT,stdin);
+
+    if(input[0]=='y' || input[0]=='Y'){
+        printf("Executing...");
+        while (1)
+        {
+            fork();
+        }
+    }
+    else if(input[0]=='n' || input[0]=='N'){
+        printf("Aborting action\n");
+    }
+    else printf("Invalid input.");
+}
+
 
 // This function interprets the user input and calls the required funciton based on what the user typed in
-void interpreter(char input[USER_INPUT]){
+void interpreter(int argc,char *argv[],char input[]){
+    
     char command[10]="";
     int cmd_index=0;
-    char filename[USER_INPUT]="";
+    char params[100]="";
+    int params_index=0;
     int filecount;
-    char *arg[10];
-    
+
 
 
 
     /* The loop checks if there are breaks or newlines 
     between the characters*/ 
-    for(int i=0;i<strlen(input);i++){
+    int i=0;
+    for(i=0;i<strlen(input);i++){
         if(input[i]!=' ' || input[i]==0){
             command[cmd_index]=input[i];
             cmd_index++;
@@ -232,19 +260,25 @@ void interpreter(char input[USER_INPUT]){
         else break;
     }
 
+    for(int j=i+1;j<strlen(input)-1;j++){
+        params[params_index]=input[j];
+        params_index++;
+    }
+    
+
     command[strcspn(command,"\n")] = 0; // Removes the newline character that fgets() adds
 
     if(strcmp(command,"cat")==0){
-        cat(filename);
+        cat(params);
     }
     else if(strcmp(command,"rm")==0){
-        rm(filename);
+        rm(params);
     }
     else if(strcmp(command,"clear")==0){
         clear();
     }
     else if(strcmp(command,"cowsay")==0){
-        cowsay(filecount, command);
+        cowsay(argc,*argv);
     }
     else if(strcmp(command,"exit")==0){
         exit(EXIT_SUCCESS);
@@ -252,24 +286,27 @@ void interpreter(char input[USER_INPUT]){
     else if(strcmp(command,"fork")==0){
         cfork();
     }
+    else if(strcmp(command,"forkbomb")==0){
+        forkbomb();
+    }
     else{
         printf("Error: Invalid command %s\n",command);
     }
 }
 
 
-int main(void){
+int main(int argc, char *argv[]){
 
     // We use the input variable for user input
     char input[USER_INPUT];
-    //system("clear"); //When we first initiate our shell the screen is cleared(This is Linux specific, on Windows it is system("cls"))
+    system("clear"); //When we first initiate our shell the screen is cleared(This is Linux specific, on Windows it is system("cls"))
     while (1)
     {
         prompt();
         /* fgets is more optimal than scanf for user input because it reads a line of text and is
         better at handling overflow of arrays */
         fgets(input,USER_INPUT,stdin);
-        interpreter(input);
+        interpreter(argc,*argv,input);
     }
         
     return 0;
