@@ -12,3 +12,4 @@ Sources:
 7. https://gist.github.com/RabaDabaDoba/145049536f815903c79944599c6f952a
 8. https://stackoverflow.com/questions/2347770/how-do-you-clear-the-console-screen-in-c
 9. https://linuxhint.com/use-write-system-call-c/
+10. https://www.geeksforgeeks.org/fork-bomb/

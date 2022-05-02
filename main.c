@@ -11,6 +11,8 @@
 #define BCYN "\e[1;36m"     // Cyan with bold characters
 #define reset "\e[0m"       // Value for reseting the characters to the default format
 
+#define USER_INPUT 1024
+
 void prompt(){
     
     char hostname[HOST_NAME_MAX]; // We pass the hostname to this variable
@@ -32,19 +34,17 @@ void prompt(){
     printf(reset);
 }
 
-void cat(int argc, char *argv[]){ // We pass the filename as paramater
+void cat(char filename[FILENAME_MAX]){ // We pass the filename as paramater
 
     FILE *fpReadFile; 
 
-    unsigned int counter;
     char c; // This is used for reading for reading characters in a file
 
-    fpReadFile = fopen(argv[1],"r"); // Opens the file
+    fpReadFile = fopen(filename,"r"); // Opens the file
 
     if(fpReadFile==NULL){
         
         printf("\nError: Unable to open file.");
-        exit(0);
     }
     while ((c = getc(fpReadFile)) != EOF) // Reads file character by character
     {
@@ -54,11 +54,11 @@ void cat(int argc, char *argv[]){ // We pass the filename as paramater
     printf("\n"); 
 }
 
-void rm(int argc, char *filename[]){
+void rm(char filename[FILENAME_MAX]){
 
     int ret = -1;
 
-    ret = remove(filename[1]);
+    ret = remove(filename);
 
     if(ret == 0){
         printf("File deleted succesfully.\n");
@@ -83,7 +83,6 @@ void cowsay(int argc,char *input[]){
     if( argc == 1 ) {
         printf("This program displays all of it arguments in a speech bubble.\n"
         "After typing in the command, type in what you want Tux to say.");
-        exit(EXIT_FAILURE);
     }
     for(counter=1;counter<argc; counter++){
         if(!strcmp(input[counter],"-t") || (!strcmp(input[counter],"--thought"))){
@@ -103,7 +102,6 @@ void cowsay(int argc,char *input[]){
             "-h or --help    - Displays this help text\n"
             "-v or --version - Displays the package version\n"
             "-t or --thought - Thought bubble\n");
-            exit(EXIT_SUCCESS);
         }
     }
     
@@ -119,7 +117,6 @@ void cowsay(int argc,char *input[]){
     if(argscharcount==0){
         printf("This program displays all of it arguments in a speech bubble.\n"
         "After typing in the command, type in what you want Tux to say."); //If no arguments are given this message is printed out.
-        exit(EXIT_FAILURE);
     }
 
     argscharcount=argscharcount+1;
@@ -205,24 +202,74 @@ void cfork(){
     }else if (rc == 0){
         printf("hello, I am child (pid:%d)\n", (int) getpid());
         execv("./child", NULL);
+        kill(getpid(),SIGINT);
     } else { 
-    int rc_wait = wait(NULL);
-    printf("hello, I am parent of %d (rc_wait:%d) (pid:%d)\n", rc, rc_wait, (int) getpid());
-     }
+        int rc_wait = wait(NULL);
+        printf("\nhello, I am parent of %d (rc_wait:%d) (pid:%d)\n", rc, rc_wait, (int) getpid());
+    }
 
 }
+
+
+// This function interprets the user input and calls the required funciton based on what the user typed in
+void interpreter(char input[USER_INPUT]){
+    char command[10]="";
+    int cmd_index=0;
+    char filename[USER_INPUT]="";
+    int filecount;
+    char *arg[10];
+    
+
+
+
+    /* The loop checks if there are breaks or newlines 
+    between the characters*/ 
+    for(int i=0;i<strlen(input);i++){
+        if(input[i]!=' ' || input[i]==0){
+            command[cmd_index]=input[i];
+            cmd_index++;
+        }
+        else break;
+    }
+
+    command[strcspn(command,"\n")] = 0; // Removes the newline character that fgets() adds
+
+    if(strcmp(command,"cat")==0){
+        cat(filename);
+    }
+    else if(strcmp(command,"rm")==0){
+        rm(filename);
+    }
+    else if(strcmp(command,"clear")==0){
+        clear();
+    }
+    else if(strcmp(command,"cowsay")==0){
+        cowsay(filecount, command);
+    }
+    else if(strcmp(command,"exit")==0){
+        exit(EXIT_SUCCESS);
+    }
+    else if(strcmp(command,"fork")==0){
+        cfork();
+    }
+    else{
+        printf("Error: Invalid command %s\n",command);
+    }
+}
+
 
 int main(void){
 
     // We use the input variable for user input
-    char input[MAX_INPUT];
-    system("clear"); //When we first initiate our shell the screen is cleared(This is Linux specific, on Windows it is system("cls"))
+    char input[USER_INPUT];
+    //system("clear"); //When we first initiate our shell the screen is cleared(This is Linux specific, on Windows it is system("cls"))
     while (1)
     {
         prompt();
         /* fgets is more optimal than scanf for user input because it reads a line of text and is
         better at handling overflow of arrays */
-        fgets(input,MAX_INPUT,stdin);
+        fgets(input,USER_INPUT,stdin);
+        interpreter(input);
     }
         
     return 0;
