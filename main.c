@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/wait.h>
+#include <signal.h>
 
                             // Color values using the ANSI color method from the  <stdlib.h>
 #define BRED "\e[1;31m"     // Red with bold characters
@@ -193,7 +194,7 @@ void clear(){
     write(STDOUT_FILENO, CLEAR_SCREEN_ANSI, 11);    // Write method takes in the CLEAR_SCREEN_ANSI variable and
 }                                                   // outputs it, which clears the screen
 
-void cfork(){
+void myfork(){
 
     int rc = fork();
 
@@ -205,6 +206,7 @@ void cfork(){
         printf("hello, I am child (pid:%d)\n", (int) getpid());
         execv("./child", NULL);
         kill(getpid(),SIGINT);
+        printf("process killed.");
     } else { 
         int rc_wait = wait(NULL);
         printf("\nhello, I am parent of %d (rc_wait:%d) (pid:%d)\n", rc, rc_wait, (int) getpid());
@@ -284,7 +286,7 @@ void interpreter(int argc,char *argv[],char input[]){
         exit(EXIT_SUCCESS);
     }
     else if(strcmp(command,"fork")==0){
-        cfork();
+        myfork()
     }
     else if(strcmp(command,"forkbomb")==0){
         forkbomb();
