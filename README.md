@@ -1,6 +1,6 @@
 # Shell: CLAM
 
-Members: Dorijan Komšić, Kenan Lokvančić
+**Members**: Dorijan Komšić, Kenan Lokvančić
 
 # Q1: What does mmap() do?
 

@@ -246,7 +246,6 @@ void interpreter(int argc,char *argv[],char input[]){
     int cmd_index=0;
     char params[100]="";
     int params_index=0;
-    int filecount;
 
 
 
